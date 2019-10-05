@@ -6,4 +6,4 @@ Our project aims to perform inappropriate language detection in tweets. In order
 1. One consumer will create some analytics and save the results to Apache Cassandra NoSQL database. This analysis will group by results per re- gion/country/continent etc. which will be defined in later stages. Then, from the database, the data will be read, and Tableau will be used for visualization.
 2. The other consumer will present analytics in real time using Tableau for visualization. This analysis will show the real-time statistics grouped by user (i.e. how many offensive tweets each user has).
 
-The model predictions will be based on Machine Learning and Natural Lan- guage Processing (NLP) techniques.
+The model predictions will be based on Machine Learning and Natural Language Processing (NLP) techniques.
