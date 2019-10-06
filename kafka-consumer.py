@@ -23,7 +23,7 @@ if __name__ == "__main__":
     sc.setLogLevel("ERROR")
 
     # Set the Batch duration to 10 sec of Streaming Context
-    ssc = StreamingContext(sc, 5)
+    ssc = StreamingContext(sc, 10)
 
     # Create Kafka Stream to Consume Data Comes From Twitter Topic
     # localhost:2181 = Default Zookeeper Consumer Address
@@ -36,7 +36,8 @@ if __name__ == "__main__":
     user_counts = kafkaStream \
         .map(lambda value: json.loads(value[1]))\
         .filter(filter_tweets)\
-        .map(lambda json_object: (json_object["user"]["screen_name"], 1))
+        .map(lambda json_object: (json_object["user"]["screen_name"], 1)) \
+        .reduceByKey(lambda x, y: x + y)
 
     # Print the User tweet counts
     user_counts.pprint()
