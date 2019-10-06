@@ -7,3 +7,21 @@ Our project aims to perform inappropriate language detection in tweets. In order
 2. The other consumer will present analytics in real time using Tableau for visualization. This analysis will show the real-time statistics grouped by user (i.e. how many offensive tweets each user has).
 
 The model predictions will be based on Machine Learning and Natural Language Processing (NLP) techniques.
+
+
+
+
+RUNNING PROGRAM;
+
+1. Start Apache Kafka (zookeeper , kafka) 
+    sh start-zookeeper.sh
+    sh start-kafka.sh
+
+2. Start Producer
+    python3 kafka-twitter.py
+
+3. Start Consumer 
+    (Important NOTE: --package spark-streaming-kafka-x-x_x.xx:x.x.x changes according to your version in $SPARK_HOME/jars/spark-core_x.xx-y.y.y.jar)
+
+    PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3 kafka-consumer.py
+
