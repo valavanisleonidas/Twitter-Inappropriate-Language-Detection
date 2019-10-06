@@ -11,17 +11,38 @@ The model predictions will be based on Machine Learning and Natural Language Pro
 
 
 
-RUNNING PROGRAM;
+RUNNING PROGRAM
 
-1. Start Apache Kafka (zookeeper , kafka) 
+install spark, kafka, cassandra
+
+1. Start Apache Kafka (zookeeper , kafka) and Cassandra 
     sh start-zookeeper.sh
     sh start-kafka.sh
+    sh start-cassandra.sh
 
 2. Start Producer
     python3 kafka-twitter.py
 
-3. Start Consumer 
+3. Start Consumer1 (real-time analytics) 
     (Important NOTE: --package spark-streaming-kafka-x-x_x.xx:x.x.x changes according to your version in $SPARK_HOME/jars/spark-core_x.xx-y.y.y.jar)
 
     PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3 kafka-consumer.py
+
+
+4. Start Consumer2 (save to cassandra)
+    without need of spark:
+        - python3 kafka-consumer-cassandra.py
+    with need of spark:
+        -  PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3 kafka-consumer-cassandra.py 
+
+
+CASSANDRA CONFIG :
+create keyspace in Cassandra and Talbe 
+
+-$CASSANDRA_HOME/bin/cqlsh
+-create keyspace Inappropriate_Language_Detection
+     with replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+-describe keyspaces;   
+-use Inappropriate_Language_Detection;
+-create table inappropriate_tweets (tweet text, prediction int, primary key (tweet));
 
