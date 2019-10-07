@@ -1,7 +1,4 @@
-import uuid
 
-from cassandra.cqlengine import columns
-from cassandra.cqlengine.models import Model
 from kafka.consumer import KafkaConsumer
 
 from cassandra.cluster import Cluster
