@@ -33,7 +33,12 @@ install spark, kafka, cassandra
     without need of spark:
         - python3 kafka-consumer-cassandra.py
     with need of spark:
-        -  PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3 kafka-consumer-cassandra.py 
+        - install pyspark_cassandra (hard to do..)
+            - git clone https://github.com/anguenot/pyspark-cassandra.git
+            - cd pyspark_cassandra
+            - sbt compile
+            
+        -  PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3,anguenot/pyspark-cassandra:2.4.0 --conf spark.cassandra.connection.host=127.0.0.1 kafka-consumer-cassandra.py 
 
 
 CASSANDRA CONFIG :
@@ -45,4 +50,5 @@ create keyspace in Cassandra and Talbe
 -describe keyspaces;   
 -use Inappropriate_Language_Detection;
 -create table inappropriate_tweets (tweet text, prediction int, primary key (tweet));
+
 

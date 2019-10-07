@@ -1,13 +1,18 @@
+import uuid
+
 from cassandra.cqlengine import columns
 from cassandra.cqlengine.models import Model
 from kafka.consumer import KafkaConsumer
 
 from cassandra.cluster import Cluster
+
 import json
 
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
+import pyspark_cassandra
+
 
 cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
@@ -17,17 +22,10 @@ cluster = Cluster()
 session = cluster.connect(cassandra_keyspace)
 
 
-class InappropriateTweet(Model):
-    id = columns.UUID(primary_key=True)
-    tweet = columns.Text()
-    prediction = columns.Integer
-
-
 def tweet_contains_user(json_tweet):
     if 'user' in json_tweet and 'screen_name' in json_tweet['user']:
         return True
     return False
-
 
 def main():
     # Create Spark Context to Connect Spark Cluster
@@ -45,22 +43,14 @@ def main():
     user_counts = kafkaStream \
         .map(lambda value: json.loads(value[1])) \
         .filter(tweet_contains_user) \
-        .map(lambda x: {x["user"]["screen_name"], 1}) \
+        .map(lambda x: (x["user"]["screen_name"], 1)) \
         .reduceByKey(lambda x, y: x + y) \
         .map(lambda x: {'tweet': x[0], 'prediction': x[1]})
 
     user_counts.pprint()
 
-    # user_counts.foreachRDD(lambda x: InappropriateTweet.create(tweet="asdas", prediction=1).save())
-    # user_counts.saveToCassandra(cassandra_keyspace, cassandra_table)
-    # user_counts.foreachRDD(lambda x: x.saveToCassandra(cassandra_keyspace, cassandra_table))
+    user_counts.foreachRDD(lambda x: x.saveToCassandra(cassandra_keyspace, cassandra_table))
 
-    # df = spark.createDataFrame(user_counts)
-    # df.write \
-    #     .format("org.apache.spark.sql.cassandra") \
-    #     .mode('append') \
-    #     .options(table="kv", keyspace="test") \
-    #     .save()
 
     # Start Execution of Streams
     ssc.start()
@@ -85,7 +75,7 @@ def main2():
                              api_version=(0, 10),
                              consumer_timeout_ms=1000,
                              value_deserializer=lambda x: json.loads(x.decode('utf-8')))
-    
+
     print("inserting to db")
     for tweet in consumer:
         insert_tweet_to_db(tweet.value)
