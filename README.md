@@ -42,13 +42,13 @@ install spark, kafka, cassandra
 
 
 CASSANDRA CONFIG :
-create keyspace in Cassandra and Talbe 
+create keyspace and table in Cassandra 
 
--$CASSANDRA_HOME/bin/cqlsh
--create keyspace Inappropriate_Language_Detection
+- $CASSANDRA_HOME/bin/cqlsh
+- create keyspace Inappropriate_Language_Detection
      with replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
--describe keyspaces;   
--use Inappropriate_Language_Detection;
--create table inappropriate_tweets (tweet text, prediction int, primary key (tweet));
+- describe keyspaces;   
+- use Inappropriate_Language_Detection;
+- create table inappropriate_tweets (tweet text, prediction int, primary key (tweet));
 
 
