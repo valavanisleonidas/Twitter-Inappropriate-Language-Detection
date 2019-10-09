@@ -3,7 +3,7 @@ import logging
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
-from kafka import SimpleProducer, SimpleClient
+from kafka import SimpleProducer, SimpleClient, KafkaProducer
 import twitter_config
 
 consumer_key = twitter_config.consumer_key
@@ -21,13 +21,14 @@ class TwitterStreamListener(StreamListener):
     def __init__(self):
         # localhost:9092 = Default Zookeeper Producer Host and Port Adresses
         super().__init__()
-        self.client = SimpleClient("localhost:9092")
 
-        self.producer = SimpleProducer(self.client)
+        self.producer = KafkaProducer(bootstrap_servers=['kafka:9092'],
+                                      client_id="kafka-python-producer",
+                                      api_version=(0, 10, 1))
 
     def on_data(self, data):
         # send data to topic named twitter
-        self.producer.send_messages("twitter", data.encode('utf-8'))
+        self.producer.send("twitter", data.encode('utf-8'))
         # print(data)
         return True
 

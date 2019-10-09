@@ -22,7 +22,11 @@ install spark, kafka, cassandra
 
 2. Start Producer
     python3 kafka-twitter.py
+    
+    -check topic count of messages
+        - $KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092,localhost:9093,localhost:9094 --topic twitter --time -1
 
+    
 3. Start Consumer1 (real-time analytics) 
     (Important NOTE: --package spark-streaming-kafka-x-x_x.xx:x.x.x changes according to your version in $SPARK_HOME/jars/spark-core_x.xx-y.y.y.jar)
 
