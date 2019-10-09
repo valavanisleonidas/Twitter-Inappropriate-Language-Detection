@@ -1,0 +1,22 @@
+docker stuff
+
+-create images and run them
+docker-compose up
+
+-go inside docker image 
+docker run --rm --network wurstmeister_default wurstmeister/kafka kafka-topics.sh \
+
+-go to kafka
+docker run --rm --network wurstmeister_default wurstmeister/kafka kafka-topics.sh --create --topic test --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+
+-see topics 
+docker run --rm --network wurstmeister_default wurstmeister/kafka kafka-topics.sh --list --zookeeper zookeeper:2181
+
+-count tweets in topic kafka
+docker run --rm --network wurstmeister_default wurstmeister/kafka kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list kafka:9092 --topic twitter --time -1
+
+
+
+
+docker build -t kafka-producer .
+docker run kafka-producer
