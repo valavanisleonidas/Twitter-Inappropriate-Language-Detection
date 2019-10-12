@@ -19,16 +19,20 @@ services:
 
   tweet-producer:
     image: kafka-producer:latest
-    build: ./kafka-producer
+    build:
+      context: ./
+      dockerfile: ./kafka-producer/Dockerfile
     ports:
       - "8080:8080"
     tty: true
     depends_on:
       - kafka
 
-  tweet-consumer:
+  tweet-consumer-1:
     image: kafka-consumer-1:latest
-    build: ./kafka-consumer-realtime
+    build:
+      context: ./
+      dockerfile: ./kafka-consumer-realtime/Dockerfile
     ports:
      - "8081:8081"
     tty: true
