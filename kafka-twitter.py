@@ -3,7 +3,7 @@ import logging
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
-from kafka import SimpleProducer, SimpleClient, KafkaProducer
+from kafka import KafkaProducer
 import twitter_config
 
 consumer_key = twitter_config.consumer_key

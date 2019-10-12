@@ -2,6 +2,8 @@ import pickle
 import sys
 from os.path import abspath
 from nltk.stem.porter import *
+import warnings
+warnings.filterwarnings("ignore")
 
 FINAL_VECT = abspath("model/final_count_vect.pkl")
 FINAL_TFIDF = abspath("model/final_tf_transformer.pkl")
