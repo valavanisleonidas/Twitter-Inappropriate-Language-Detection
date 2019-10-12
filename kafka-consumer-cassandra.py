@@ -1,4 +1,3 @@
-
 from kafka.consumer import KafkaConsumer
 
 from cassandra.cluster import Cluster
@@ -11,7 +10,6 @@ from pyspark.streaming.kafka import KafkaUtils
 import pyspark_cassandra
 from predict_model import predict
 
-
 cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
 kafka_topic = 'twitter'
@@ -20,19 +18,19 @@ cluster = Cluster()
 session = cluster.connect(cassandra_keyspace)
 
 
-
-
 def filter_tweets_have_user(json_tweet):
     # print(json_tweet)
     if 'user' in json_tweet and 'screen_name' in json_tweet['user']:
         return True
     return False
 
+
 def filter_tweets_only_english(json_tweet):
     lang = json_tweet['lang']
     if lang == 'en':
         return True
     return False
+
 
 # classes : 0-hateful, 1-offensive, and 2-clean
 def filter_tweets_only_offensive(json_tweet):
@@ -45,11 +43,11 @@ def filter_tweets_only_offensive(json_tweet):
         return True
     return False
 
+
 def predict_tweet(json_tweet):
     text = json_tweet["text"]
     prediction = predict([text])
     return prediction
-
 
 
 def main():
@@ -77,7 +75,6 @@ def main():
     user_offensive_tweets.pprint()
 
     user_offensive_tweets.foreachRDD(lambda x: x.saveToCassandra(cassandra_keyspace, cassandra_table))
-
 
     # Start Execution of Streams
     ssc.start()
