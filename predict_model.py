@@ -29,8 +29,6 @@ class preprocess_data():
         return parsed_text
 
 
-sys.modules['data.preprocess_data'] = preprocess_data()
-
 with open(FINAL_VECT, 'rb') as final_count_vect:
     count_vect = pickle.load(final_count_vect)
 with open(FINAL_TFIDF, 'rb') as final_tf_transformer:

@@ -26,11 +26,11 @@ services:
     depends_on:
       - kafka
 
-  # tweet-consumer:
-  #   image: kafka-consumer-1:latest
-  #   build: ./kafka-consumer-realtime
-  #   ports:
-  #    - "8081:8081"
-  #   tty: true
-  #   depends_on:
-  #    - kafka
+  tweet-consumer:
+    image: kafka-consumer-1:latest
+    build: ./kafka-consumer-realtime
+    ports:
+     - "8081:8081"
+    tty: true
+    depends_on:
+     - kafka

@@ -50,7 +50,7 @@ def main():
 
     # Create Kafka Stream to Consume Data Comes From Twitter Topic
     # localhost:2181 = Default Zookeeper Consumer Address
-    kafkaStream = KafkaUtils.createStream(ssc, 'localhost:2181', 'spark-streaming', {'twitter': 1})
+    kafkaStream = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'spark-streaming', {'twitter': 1})
 
     # Count the number of offensive tweets per user
     user_offensive_tweets = kafkaStream \
