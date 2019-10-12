@@ -10,8 +10,7 @@ services:
       - 9094:9094
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
-      # KAFKA_ADVERTISED_PORT: "9092"
-      KAFKA_CREATE_TOPICS: "twitter:1:1" 
+      KAFKA_CREATE_TOPICS: "twitter:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://kafka:9094
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://localhost:9094
@@ -20,8 +19,18 @@ services:
 
   tweet-producer:
     image: kafka-producer:latest
+    build: ./kafka-producer
     ports:
       - "8080:8080"
     tty: true
     depends_on:
       - kafka
+
+  # tweet-consumer:
+  #   image: kafka-consumer-1:latest
+  #   build: ./kafka-consumer-realtime
+  #   ports:
+  #    - "8081:8081"
+  #   tty: true
+  #   depends_on:
+  #    - kafka

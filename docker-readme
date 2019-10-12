@@ -23,3 +23,4 @@ docker run --rm --network twitter-inappropriate-language-detection_default wurst
 docker build -t kafka-producer .
 docker run kafka-producer
 
+docker build -t kafka-producer -f kafka-producer/Dockerfile .
