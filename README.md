@@ -50,6 +50,9 @@ create keyspace and table in Cassandra
      with replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 - describe keyspaces;   
 - use Inappropriate_Language_Detection;
-- create table inappropriate_tweets (tweet text, prediction int, primary key (tweet));
+- create table inappropriate_tweets (tweet text, username text, prediction int, date text, country text, primary key (tweet));
+
+
+
 
 

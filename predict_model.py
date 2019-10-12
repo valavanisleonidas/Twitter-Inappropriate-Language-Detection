@@ -44,7 +44,7 @@ def predict(input_text):
     input_counts = obj[0].transform(input_text)
     input_tfidf = obj[1].transform(input_counts)
     predicted = obj[2].predict(input_tfidf)
-    return predicted
+    return predicted[0]
 
 
 if __name__ == '__main__':
@@ -52,4 +52,4 @@ if __name__ == '__main__':
     while True:
         input_words = input("Enter input text: ")
         predicted_class = predict([input_words])
-        print(['Hate speech', 'Offensive', 'Clean'][predicted_class[0]])
+        print(['Hate speech', 'Offensive', 'Clean'][predicted_class])

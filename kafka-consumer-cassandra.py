@@ -8,7 +8,10 @@ from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 import pyspark_cassandra
+
 from predict_model import predict
+from datetime import datetime
+
 
 cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
@@ -20,6 +23,7 @@ session = cluster.connect(cassandra_keyspace)
 
 def filter_tweets_have_user(json_tweet):
     # print(json_tweet)
+
     if 'user' in json_tweet and 'screen_name' in json_tweet['user']:
         return True
     return False
@@ -28,6 +32,16 @@ def filter_tweets_have_user(json_tweet):
 def filter_tweets_only_english(json_tweet):
     lang = json_tweet['lang']
     if lang == 'en':
+        return True
+    return False
+
+
+def filter_has_location_info(json_tweet):
+    if json_tweet['place'] is not None \
+            and 'country' in json_tweet['place'] \
+            and json_tweet['place']['country'] is not None:
+
+        # print(json_tweet)
         return True
     return False
 
@@ -68,9 +82,14 @@ def main():
         .filter(filter_tweets_have_user) \
         .filter(filter_tweets_only_english) \
         .filter(filter_tweets_only_offensive) \
-        .map(lambda json_object: (json_object["user"]["screen_name"], 1)) \
-        .reduceByKey(lambda x, y: x + y) \
-        .transform(lambda rdd: rdd.sortBy(lambda x: x[1], ascending=False))
+        .filter(filter_has_location_info) \
+        .map(lambda json_tweet: {
+            'tweet': json_tweet['text'],
+            'country': json_tweet['place']['country'],
+            'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            'prediction': int(predict_tweet(json_tweet)),
+            'username': json_tweet["user"]["screen_name"]
+        })
 
     user_offensive_tweets.pprint()
 
