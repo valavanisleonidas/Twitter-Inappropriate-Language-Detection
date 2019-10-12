@@ -4,10 +4,12 @@ services:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
+    restart: always
   kafka:
     image: wurstmeister/kafka
     ports:
       - 9094:9094
+    restart: always
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_CREATE_TOPICS: "twitter:1:1"
@@ -25,6 +27,7 @@ services:
     ports:
       - "8080:8080"
     tty: true
+    restart: always
     depends_on:
       - kafka
 
@@ -36,5 +39,6 @@ services:
     ports:
      - "8081:8081"
     tty: true
+    restart: always
     depends_on:
      - kafka

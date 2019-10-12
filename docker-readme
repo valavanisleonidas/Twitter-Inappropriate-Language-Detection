@@ -24,3 +24,6 @@ docker build -t kafka-producer .
 docker run kafka-producer
 
 docker build -t kafka-producer -f kafka-producer/Dockerfile .
+
+
+docker-compose up --build in root folder to download,build images and run
