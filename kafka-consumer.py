@@ -2,14 +2,42 @@
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
+
 import json
 
+from predict_model import predict
 
-def filter_tweets(json_tweet):
+
+def filter_tweets_have_user(json_tweet):
     # print(json_tweet)
     if 'user' in json_tweet and 'screen_name' in json_tweet['user']:
         return True
     return False
+
+def filter_tweets_only_english(json_tweet):
+    lang = json_tweet['lang']
+    if lang == 'en':
+        return True
+    return False
+
+# classes : 0-hateful, 1-offensive, and 2-clean
+def filter_tweets_only_offensive(json_tweet):
+    prediction = predict_tweet(json_tweet)
+
+    if prediction == 1:
+        # print('===========BEGIN TWEET ===================')
+        # print(json_tweet["text"], '  prediction : ', prediction)
+        # print('===========END TWEET===================')
+        return True
+    return False
+
+
+def predict_tweet(json_tweet):
+    text = json_tweet["text"]
+    prediction = predict([text])
+    return prediction
+
+
 
 
 def main():
@@ -24,15 +52,21 @@ def main():
     # localhost:2181 = Default Zookeeper Consumer Address
     kafkaStream = KafkaUtils.createStream(ssc, 'localhost:2181', 'spark-streaming', {'twitter': 1})
 
-    # Count the number of tweets per User
-    user_counts = kafkaStream \
+    # Count the number of offensive tweets per user
+    user_offensive_tweets = kafkaStream \
         .map(lambda value: json.loads(value[1])) \
-        .filter(filter_tweets) \
+        .filter(filter_tweets_have_user) \
+        .filter(filter_tweets_only_english) \
+        .filter(filter_tweets_only_offensive) \
         .map(lambda json_object: (json_object["user"]["screen_name"], 1)) \
-        .reduceByKey(lambda x, y: x + y)
+        .reduceByKey(lambda x, y: x + y) \
+        .transform(lambda rdd: rdd.sortBy(lambda x: x[1], ascending=False))
 
-    # Print the User tweet counts
-    user_counts.pprint()
+    # .map(lambda json_object: (json_object["text"], 1))
+    # .map(lambda json_object: (json_object["user"]["screen_name"], 1))
+
+    # Print the User and the predictions
+    user_offensive_tweets.pprint()
 
     # Start Execution of Streams
     ssc.start()
