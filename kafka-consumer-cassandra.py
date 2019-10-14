@@ -12,13 +12,20 @@ import pyspark_cassandra
 from predict_model import predict
 from datetime import datetime
 
-
 cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
 kafka_topic = 'twitter'
 
 cluster = Cluster()
 session = cluster.connect(cassandra_keyspace)
+
+session.execute('create keyspace if not exists Inappropriate_Language_Detection with replication = '
+                '{\'class\': \'SimpleStrategy\', \'replication_factor\': 1};')
+
+session.execute('use Inappropriate_Language_Detection;')
+
+session.execute('create table if not exists inappropriate_tweets '
+                '(tweet text, username text, prediction int, date text, country text, primary key (tweet));')
 
 
 def filter_tweets_have_user(json_tweet):
@@ -40,7 +47,6 @@ def filter_has_location_info(json_tweet):
     if json_tweet['place'] is not None \
             and 'country' in json_tweet['place'] \
             and json_tweet['place']['country'] is not None:
-
         # print(json_tweet)
         return True
     return False
@@ -84,12 +90,12 @@ def main():
         .filter(filter_tweets_only_offensive) \
         .filter(filter_has_location_info) \
         .map(lambda json_tweet: {
-            'tweet': json_tweet['text'],
-            'country': json_tweet['place']['country'],
-            'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-            'prediction': int(predict_tweet(json_tweet)),
-            'username': json_tweet["user"]["screen_name"]
-        })
+        'tweet': json_tweet['text'],
+        'country': json_tweet['place']['country'],
+        'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        'prediction': int(predict_tweet(json_tweet)),
+        'username': json_tweet["user"]["screen_name"]
+    })
 
     user_offensive_tweets.pprint()
 
