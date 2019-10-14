@@ -1,4 +1,3 @@
-
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
@@ -14,11 +13,13 @@ def filter_tweets_have_user(json_tweet):
         return True
     return False
 
+
 def filter_tweets_only_english(json_tweet):
     lang = json_tweet['lang']
     if lang == 'en':
         return True
     return False
+
 
 # classes : 0-hateful, 1-offensive, and 2-clean
 def filter_tweets_only_offensive(json_tweet):
@@ -36,8 +37,6 @@ def predict_tweet(json_tweet):
     text = json_tweet["text"]
     prediction = predict([text])
     return prediction
-
-
 
 
 def main():
