@@ -44,7 +44,8 @@ ENV PATH=$PATH:$SPARK_HOME/bin/
 ENV PYSPARK_PYTHON python3
 
 
-ADD kafka-consumer.py /
+ADD kafka-consumer-realtime/kafka-consumer.py /
+
 ADD predict_model.py /
 ADD model model/
 

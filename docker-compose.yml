@@ -1,5 +1,13 @@
 version: '3'
 services:
+
+  # cassandra:
+  #   image : cassandra
+  #   ports:
+  #     - "7000:7000"
+  #   restart: always
+
+    
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -22,8 +30,9 @@ services:
   tweet-producer:
     image: kafka-producer:latest
     build:
-      context: ./
-      dockerfile: ./kafka-producer/Dockerfile
+      ./kafka-producer
+      # context: ./
+      # dockerfile: ./kafka-producer/Dockerfile
     ports:
       - "8080:8080"
     tty: true
