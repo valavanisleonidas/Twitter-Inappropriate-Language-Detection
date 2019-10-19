@@ -18,7 +18,7 @@ DOCKER README
 
 
 -connect to cassandra cqlsh
-    docker run -it --network twitter-inappropriate-language-detection --rm cassandra cqlsh cassandra
+    docker run -it --rm  --network twitter-inappropriate-language-detection bitnami/cassandra:latest cqlsh --username cassandra --password cassandra cassandra
 
 
 -BUILD/RUN IMAGES MANUALLY 

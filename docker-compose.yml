@@ -5,28 +5,29 @@ networks:
     external: false
     name : twitter-inappropriate-language-detection
 
-
 services:
-  # cassandra:
-  #   image: 'bitnami/cassandra:latest'
-  #   environment:
-  #     - CASSANDRA_TRANSPORT_PORT_NUMBER=7000
-  #   ports:
-  #       - '9042:9042'
-  #   restart: always
-  #   networks:
-  #     - twitter-inappropriate-language-detection
-
   cassandra:
-    image: cassandra:2.2.6
+    image: 'bitnami/cassandra:latest'
+    ports:
+      - '7000:7000'
+      - '9042:9042'
+    container_name: cassandra
+    restart: always
+    environment:
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
     networks:
       - twitter-inappropriate-language-detection
+    volumes:
+      - './cassandra_persistence:/bitnami'
 
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
     restart: always
+    container_name: zookeeper
     networks:
       - twitter-inappropriate-language-detection
 
@@ -37,6 +38,7 @@ services:
     networks:
       - twitter-inappropriate-language-detection
     restart: always
+    container_name: kafka
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_CREATE_TOPICS: "twitter:1:1"
@@ -54,6 +56,7 @@ services:
       # dockerfile: ./kafka-producer/Dockerfile
     ports:
       - "8080:8080"
+    container_name: kafka-producer
     tty: true
     restart: always
     networks:
@@ -68,6 +71,7 @@ services:
       dockerfile: ./kafka-consumer-realtime/Dockerfile
     ports:
      - "8081:8081"
+    container_name: kafka-consumer-1
     tty: true
     restart: always
     networks:
