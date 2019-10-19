@@ -1,29 +1,30 @@
-docker stuff
+DOCKER README
 
 -create images and run them
-docker-compose up
+    docker-compose up --build
 
-NOTE : BE CAREFUL----- twitter-inappropriate-language-detection_default is the network name... CHANGE with your OWN
 
 -go inside docker image 
-docker run --rm --network twitter-inappropriate-language-detection_default wurstmeister/kafka kafka-topics.sh \
+    docker run --rm --network twitter-inappropriate-language-detection wurstmeister/kafka kafka-topics.sh \
 
 -go to kafka
-docker run --rm --network twitter-inappropriate-language-detection_default wurstmeister/kafka kafka-topics.sh --create --topic test --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+    docker run --rm --network twitter-inappropriate-language-detection wurstmeister/kafka kafka-topics.sh --create --topic test --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
 
 -see topics 
-docker run --rm --network twitter-inappropriate-language-detection_default wurstmeister/kafka kafka-topics.sh --list --zookeeper zookeeper:2181
+    docker run --rm --network twitter-inappropriate-language-detection wurstmeister/kafka kafka-topics.sh --list --zookeeper zookeeper:2181
 
 -count tweets in topic kafka
-docker run --rm --network twitter-inappropriate-language-detection_default wurstmeister/kafka kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list kafka:9092 --topic twitter --time -1
+    docker run --rm --network twitter-inappropriate-language-detection wurstmeister/kafka kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list kafka:9092 --topic twitter --time -1
 
 
+-connect to cassandra cqlsh
+    docker run -it --network twitter-inappropriate-language-detection --rm cassandra cqlsh cassandra
 
 
-docker build -t kafka-producer .
-docker run kafka-producer
+-BUILD/RUN IMAGES MANUALLY 
 
-docker build -t kafka-producer -f kafka-producer/Dockerfile .
+    docker build -t kafka-producer .
+    docker run kafka-producer
 
+    docker build -t kafka-producer -f kafka-producer/Dockerfile .
 
-docker-compose up --build in root folder to download,build images and run

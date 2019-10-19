@@ -1,22 +1,41 @@
-version: '3'
+version: '3.5'
+
+networks:
+  twitter-inappropriate-language-detection:
+    external: false
+    name : twitter-inappropriate-language-detection
+
+
 services:
-
   # cassandra:
-  #   image : cassandra
+  #   image: 'bitnami/cassandra:latest'
+  #   environment:
+  #     - CASSANDRA_TRANSPORT_PORT_NUMBER=7000
   #   ports:
-  #     - "7000:7000"
+  #       - '9042:9042'
   #   restart: always
+  #   networks:
+  #     - twitter-inappropriate-language-detection
 
-    
+  cassandra:
+    image: cassandra:2.2.6
+    networks:
+      - twitter-inappropriate-language-detection
+
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
     restart: always
+    networks:
+      - twitter-inappropriate-language-detection
+
   kafka:
     image: wurstmeister/kafka
     ports:
       - 9094:9094
+    networks:
+      - twitter-inappropriate-language-detection
     restart: always
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
@@ -37,6 +56,8 @@ services:
       - "8080:8080"
     tty: true
     restart: always
+    networks:
+      - twitter-inappropriate-language-detection
     depends_on:
       - kafka
 
@@ -49,5 +70,7 @@ services:
      - "8081:8081"
     tty: true
     restart: always
+    networks:
+      - twitter-inappropriate-language-detection
     depends_on:
      - kafka
