@@ -1,10 +1,10 @@
 from pyspark import SparkContext
+from pyspark.sql import SparkSession
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
+from predict_model import predict
 
 import json
-
-from predict_model import predict
 
 checkpoints_folder = "checkpoints"
 
@@ -61,10 +61,11 @@ def create_transformations(kafka_stream):
 
 def setup():
     sc = SparkContext(appName="PythonStreamingTweets")
-    sc.setLogLevel("ERROR")
+    # sc.setLogLevel("ERROR")
 
     # Set the Batch duration to 10 sec of Streaming Context
     ssc = StreamingContext(sc, 10)
+    ssc.sparkContext.setLogLevel("ERROR")
     ssc.checkpoint(checkpoints_folder)
 
     kafka_params = {"metadata.broker.list": "kafka:9092",
@@ -90,6 +91,7 @@ def setup():
 def main():
     # Create Spark Context to Connect Spark Cluster
     ssc = StreamingContext.getOrCreate(checkpoints_folder, setup)
+    ssc.sparkContext.setLogLevel("ERROR")
 
     # Start Execution of Streams
     ssc.start()
