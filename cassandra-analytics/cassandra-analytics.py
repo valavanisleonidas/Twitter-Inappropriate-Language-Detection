@@ -20,6 +20,7 @@ def main():
 
     json_list = []
     tweets = session.execute(query)
+
     for tweet in tweets:
         json_obj = {'tweet':tweet.tweet,
                     'username':tweet.username,
