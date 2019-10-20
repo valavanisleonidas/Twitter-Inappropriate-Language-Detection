@@ -1,7 +1,15 @@
-DOCKER README
+DOCKER useful commands/readme
 
 -create images and run them
     docker-compose up --build
+
+    -BUILD/RUN IMAGES MANUALLY
+        example:
+        docker build -t image-name .
+        docker run image-name
+
+        docker build -t image-name -f path/to/Dockerfile .
+
 
 
 -go inside docker image 
@@ -16,15 +24,7 @@ DOCKER README
 -count tweets in topic kafka
     docker run --rm --network twitter-inappropriate-language-detection wurstmeister/kafka kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list kafka:9092 --topic twitter --time -1
 
-
 -connect to cassandra cqlsh
     docker run -it --rm  --network twitter-inappropriate-language-detection bitnami/cassandra:latest cqlsh --username cassandra --password cassandra cassandra
 
-
--BUILD/RUN IMAGES MANUALLY 
-
-    docker build -t kafka-producer .
-    docker run kafka-producer
-
-    docker build -t kafka-producer -f kafka-producer/Dockerfile .
 
