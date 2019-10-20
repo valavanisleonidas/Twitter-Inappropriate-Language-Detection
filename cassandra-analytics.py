@@ -1,6 +1,7 @@
 import pandas as pd
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
+import json
 
 cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
@@ -17,14 +18,27 @@ def main():
 
     query = 'SELECT * FROM inappropriate_tweets'
 
-    # tweets = session.execute(query)
-    # for tweet in tweets:
-    #     print(tweet.tweet,tweet.username, tweet.date, tweet.prediction, tweet.country)
+    json_list = []
+    tweets = session.execute(query)
+    for tweet in tweets:
+        json_obj = {'tweet':tweet.tweet,
+                    'username':tweet.username,
+                    'date':tweet.date,
+                    'prediction':tweet.prediction,
+                    'country':tweet.country}
 
-    df = pd.DataFrame(list(session.execute(query)))
+        json_list.append(json_obj)
 
-    group = df.groupby('country')
-    print(group.groups)
+        # print(tweet.tweet,tweet.username, tweet.date, tweet.prediction, tweet.country)
+
+    with open('cassandra.json', 'w') as f:
+        json.dump(json_list, f)
+
+    # df = pd.DataFrame(list(session.execute(query)))
+    # df.to_json('cassandra.json')
+
+    # group = df.groupby('country')
+    # print(group.groups)
 
 
 
