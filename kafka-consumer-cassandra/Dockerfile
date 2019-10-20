@@ -104,7 +104,7 @@ RUN sbt compile
 WORKDIR /  
 
 ADD kafka-consumer-cassandra/kafka-consumer-cassandra.py /
-ADD predict_model.py /
+ADD model/predict_model.py /
 ADD model model/
 
 RUN pip install --upgrade pip && \

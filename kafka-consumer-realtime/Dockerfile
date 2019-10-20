@@ -45,8 +45,7 @@ ENV PYSPARK_PYTHON python3
 
 
 ADD kafka-consumer-realtime/kafka-consumer.py /
-
-ADD predict_model.py /
+ADD model/predict_model.py /
 ADD model model/
 
 RUN pip install --upgrade pip && \

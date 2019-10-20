@@ -1,5 +1,4 @@
 from pyspark import SparkContext
-from pyspark.sql import SparkSession
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 from predict_model import predict
