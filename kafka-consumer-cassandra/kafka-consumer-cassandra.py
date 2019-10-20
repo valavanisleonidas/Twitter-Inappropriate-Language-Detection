@@ -1,6 +1,6 @@
-from kafka.consumer import KafkaConsumer
-
+from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
+from cassandra.policies import DCAwareRoundRobinPolicy
 
 import json
 
@@ -16,16 +16,18 @@ cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
 kafka_topic = 'twitter'
 
-cluster = Cluster()
-session = cluster.connect(cassandra_keyspace)
+auth_provider = PlainTextAuthProvider(username='cassandra', password='cassandra')
+cluster = Cluster(['cassandra'], port=9042, auth_provider=auth_provider)
 
-session.execute('create keyspace if not exists Inappropriate_Language_Detection with replication = '
-                '{\'class\': \'SimpleStrategy\', \'replication_factor\': 1};')
+# cluster = Cluster(contact_points=['cassandra'])
+session = cluster.connect()
+# session = cluster.connect(cassandra_keyspace)
 
-session.execute('use Inappropriate_Language_Detection;')
-
-session.execute('create table if not exists inappropriate_tweets '
-                '(tweet text, username text, prediction int, date text, country text, primary key (tweet));')
+# session.execute("create keyspace inappropriate_language_detection with replication = {'class': 'SimpleStrategy', 'replication_factor': 1};")
+#
+session.execute('use inappropriate_language_detection;')
+#
+# session.execute("create table if not exists inappropriate_tweets (tweet text, username text, prediction int, date text, country text, primary key (tweet));")
 
 
 def filter_tweets_have_user(json_tweet):
@@ -80,7 +82,7 @@ def main():
 
     # Create Kafka Stream to Consume Data Comes From Twitter Topic
     # localhost:2181 = Default Zookeeper Consumer Address
-    kafkaStream = KafkaUtils.createStream(ssc, 'localhost:2181', 'spark-streaming', {'twitter': 1})
+    kafkaStream = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'spark-streaming', {'twitter': 1})
 
     # Count the number of offensive tweets per user
     user_offensive_tweets = kafkaStream \

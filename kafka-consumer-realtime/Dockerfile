@@ -49,14 +49,15 @@ ADD kafka-consumer-realtime/kafka-consumer.py /
 ADD predict_model.py /
 ADD model model/
 
-RUN pip install pyspark
-RUN pip install numpy
-RUN pip install nltk
-RUN pip install pandas
-RUN pip install pytest
-RUN pip install twython
-RUN pip install scikit-learn
-RUN pip install tweepy
+RUN pip install --upgrade pip && \
+  pip install pyspark && \
+  pip install numpy && \
+  pip install nltk && \
+  pip install pandas && \
+  pip install pytest && \
+  pip install twython && \
+  pip install scikit-learn && \
+  pip install tweepy
 
 CMD PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3 kafka-consumer.py
 # CMD ["PYSPARK_PYTHON=python3" , "$SPARK_HOME/bin/spark-submit" , "--packages" , "org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3" , "kafka-consumer.py"]
