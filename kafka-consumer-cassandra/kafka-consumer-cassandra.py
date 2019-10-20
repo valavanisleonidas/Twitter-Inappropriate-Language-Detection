@@ -1,12 +1,11 @@
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
-from cassandra.policies import DCAwareRoundRobinPolicy
 
 import json
 
-from pyspark import SparkContext
+from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
-from pyspark.streaming.kafka import KafkaUtils
+from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 import pyspark_cassandra
 
 from predict_model import predict
@@ -19,15 +18,15 @@ kafka_topic = 'twitter'
 auth_provider = PlainTextAuthProvider(username='cassandra', password='cassandra')
 cluster = Cluster(['cassandra'], port=9042, auth_provider=auth_provider)
 
-# cluster = Cluster(contact_points=['cassandra'])
-session = cluster.connect()
-# session = cluster.connect(cassandra_keyspace)
+session = cluster.connect(cassandra_keyspace)
 
-# session.execute("create keyspace inappropriate_language_detection with replication = {'class': 'SimpleStrategy', 'replication_factor': 1};")
-#
-session.execute('use inappropriate_language_detection;')
-#
-# session.execute("create table if not exists inappropriate_tweets (tweet text, username text, prediction int, date text, country text, primary key (tweet));")
+conf = SparkConf() \
+    .setAppName("PySparkCassandra") \
+    .set("spark.cassandra.connection.host", "cassandra") \
+    .set("spark.cassandra.auth.username", "cassandra") \
+    .set("spark.cassandra.auth.password", "cassandra")
+
+checkpoints_folder = "checkpoints"
 
 
 def filter_tweets_have_user(json_tweet):
@@ -72,36 +71,59 @@ def predict_tweet(json_tweet):
     return prediction
 
 
-def main():
-    # Create Spark Context to Connect Spark Cluster
-    sc = SparkContext()
-    sc.setLogLevel("ERROR")
-
-    # Set the Batch duration to 10 sec of Streaming Context
-    ssc = StreamingContext(sc, 10)
-
-    # Create Kafka Stream to Consume Data Comes From Twitter Topic
-    # localhost:2181 = Default Zookeeper Consumer Address
-    kafkaStream = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'spark-streaming', {'twitter': 1})
-
+def create_transformations(kafka_stream):
     # Count the number of offensive tweets per user
-    user_offensive_tweets = kafkaStream \
+    user_offensive_tweets = kafka_stream \
         .map(lambda value: json.loads(value[1])) \
         .filter(filter_tweets_have_user) \
         .filter(filter_tweets_only_english) \
         .filter(filter_tweets_only_offensive) \
         .filter(filter_has_location_info) \
         .map(lambda json_tweet: {
-        'tweet': json_tweet['text'],
-        'country': json_tweet['place']['country'],
-        'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        'prediction': int(predict_tweet(json_tweet)),
-        'username': json_tweet["user"]["screen_name"]
-    })
+            'tweet': json_tweet['text'],
+            'country': json_tweet['place']['country'],
+            'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            'prediction': int(predict_tweet(json_tweet)),
+            'username': json_tweet["user"]["screen_name"]
+        })
 
     user_offensive_tweets.pprint()
 
     user_offensive_tweets.foreachRDD(lambda x: x.saveToCassandra(cassandra_keyspace, cassandra_table))
+
+
+def setup():
+    sc = SparkContext(conf=conf)
+
+    # Set the Batch duration to 10 sec of Streaming Context
+    ssc = StreamingContext(sc, 10)
+    ssc.sparkContext.setLogLevel("ERROR")
+    ssc.checkpoint(checkpoints_folder)
+
+    kafka_params = {"metadata.broker.list": "kafka:9092",
+                    "zookeeper.connect": "zookeeper:2181",
+                    "group.id": "spark-streaming",
+                    "zookeeper.connection.timeout.ms": "10000",
+                    "auto.offset.reset": "smallest"}
+    start = 0
+    partition = 0
+    topic = 'twitter'
+    topic_partition = TopicAndPartition(topic, partition)
+    from_offset = {topic_partition: int(start)}
+
+    # Create Kafka Stream to Consume Data Comes From Twitter Topic
+    # localhost:2181 = Default Zookeeper Consumer Address
+    kafka_stream = KafkaUtils.createDirectStream(ssc, [topic], kafka_params, fromOffsets=from_offset)
+
+    create_transformations(kafka_stream)
+
+    return ssc
+
+
+def main():
+    # Create Spark Context to Connect Spark Cluster
+    ssc = StreamingContext.getOrCreate(checkpoints_folder, setup)
+    ssc.sparkContext.setLogLevel("ERROR")
 
     # Start Execution of Streams
     ssc.start()

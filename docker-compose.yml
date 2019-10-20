@@ -100,6 +100,7 @@ services:
       - twitter-inappropriate-language-detection
     depends_on:
      - kafka
+     - cassandra
 
   portainer:
     image: portainer/portainer

@@ -1,20 +1,21 @@
 import pandas as pd
+from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 
 cassandra_keyspace = "inappropriate_language_detection"
 cassandra_table = "inappropriate_tweets"
 kafka_topic = 'twitter'
 
-cluster = Cluster()
-session = cluster.connect(cassandra_keyspace)
 
-# cluster = Cluster(['0.0.0.0'], port=9042)
-# session = cluster.connect('cityinfo', wait_for_all_pools=True)
+auth_provider = PlainTextAuthProvider(username='cassandra', password='cassandra')
+cluster = Cluster(['cassandra'], port=9042, auth_provider=auth_provider)
+
+session = cluster.connect(cassandra_keyspace)
 
 
 def main():
+
     query = 'SELECT * FROM inappropriate_tweets'
-    session.execute('use Inappropriate_Language_Detection')
 
     # tweets = session.execute(query)
     # for tweet in tweets:

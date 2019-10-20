@@ -118,6 +118,6 @@ RUN pip install --upgrade pip && \
     pip install scikit-learn && \
     pip install tweepy
 
-CMD PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3,anguenot/pyspark-cassandra:2.4.0 --conf spark.cassandra.connection.host=127.0.0.1 kafka-consumer-cassandra.py
+CMD PYSPARK_PYTHON=python3 $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.3,anguenot/pyspark-cassandra:2.4.0 kafka-consumer-cassandra.py
 
         
