@@ -17,7 +17,7 @@ The architecture is shown below
 
 ### Dependencies
 
- - Docker
+ - Docker (change memory requirements of docker to at least 4 GB)
  - Tableau (optional)
 
 ### RUNNING 
