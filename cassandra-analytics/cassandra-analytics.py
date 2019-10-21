@@ -31,7 +31,7 @@ def main():
         json_list.append(json_obj)
 
         # print(tweet.tweet,tweet.username, tweet.date, tweet.prediction, tweet.country)
-
+    print(len(json_list))
     with open('cassandra-analytics/cassandra.json', 'w') as f:
         json.dump(json_list, f)
 
