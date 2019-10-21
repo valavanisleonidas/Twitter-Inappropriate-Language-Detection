@@ -32,7 +32,7 @@ def main():
 
         # print(tweet.tweet,tweet.username, tweet.date, tweet.prediction, tweet.country)
 
-    with open('cassandra.json', 'w') as f:
+    with open('cassandra-analytics/cassandra.json', 'w') as f:
         json.dump(json_list, f)
 
     # df = pd.DataFrame(list(session.execute(query)))
