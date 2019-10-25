@@ -55,7 +55,7 @@ def create_transformations(kafka_stream):
     # .map(lambda json_object: (json_object["user"]["screen_name"], 1))
 
     # Print the User and the predictions
-    user_offensive_tweets.pprint()
+    user_offensive_tweets.pprint(10)
 
 
 def setup():
